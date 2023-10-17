@@ -17,6 +17,9 @@ class _LoginPageState extends State<LoginPage> {
   var _isLoading = false;
   late final StreamSubscription<AuthState> _authStateSubscripion;
 
+  final _emailController = TextEditingController(text: 'someone@example.com');
+  final _passwordController = TextEditingController(text: 'rBTWSCWtdgbdaEuhisNF');
+
   @override
   void initState() {
     super.initState();
@@ -57,9 +60,79 @@ class _LoginPageState extends State<LoginPage> {
           const SizedBox(
             height: 18,
           ),
+          TextField(
+            controller: _emailController,
+          ),
+          const SizedBox(
+            height: 18,
+          ),
+          TextField(
+            controller: _passwordController,
+          ),
+          const SizedBox(
+            height: 18,
+          ),
+          ElevatedButton(
+            onPressed: _isLoading ? null : _signInEmail,
+            child: Text(_isLoading ? 'Loading' : 'Sign in Email and Password'),
+          ),
+          const SizedBox(height: 18),
+          ElevatedButton(
+            onPressed: _isLoading ? null : _signUpEmail,
+            child: Text(_isLoading ? 'Loading' : 'Sign up Email and Password'),
+          ),
         ],
       ),
     );
+  }
+
+  Future<void> _signUpEmail() async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      final auth = await supabase.auth.signUp(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+      print('auth: $auth');
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Unexcepted Error. $error'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+      print('error: $error');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _signInEmail() async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      final auth = await supabase.auth.signInWithPassword(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+      print('auth: $auth');
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Unexcepted Error. $error'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   Future<void> _signInGitHub() async {
@@ -72,12 +145,12 @@ class _LoginPageState extends State<LoginPage> {
         redirectTo: 'io.supabase.flutterquickstart://login-callback/',
       );
     } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Unexcepted Error. $error'),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
+      // ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Unexcepted Error. $error'),
+        backgroundColor: Theme.of(context).colorScheme.error,
       );
+      // );
     } finally {
       setState(() {
         _isLoading = false;

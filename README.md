@@ -2,6 +2,16 @@
 
 A new Flutter project.
 
+## How to Run
+
+```shell
+# run with load '.env'
+flutter run --dart-define=ENVIRONMENT=development
+
+# run with load '.env.local'
+flutter run 
+```
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
