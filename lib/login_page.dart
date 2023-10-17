@@ -59,7 +59,8 @@ class _LoginPageState extends State<LoginPage> {
         child: ListView(
           padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
           children: [
-            const Text('Sign in with GitHub'),
+            Text('Sign in with GitHub',
+                style: Theme.of(context).textTheme.headlineSmall),
             const Gap(8.0),
             ElevatedButton(
               onPressed: _isLoading ? null : _signInGitHub,
@@ -67,7 +68,8 @@ class _LoginPageState extends State<LoginPage> {
             ),
             const Gap(8.0),
             const Divider(color: Colors.orange, thickness: 3.0),
-            const Text('Sign in with Email / Sign up with Email '),
+            Text('Sign in with Email / Sign up with Email ',
+                style: Theme.of(context).textTheme.headlineSmall),
             MyTextField(
               label: 'Email',
               controller: _emailController,
