@@ -1,9 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'main.dart';
+import 'my_text_field.dart';
 
 typedef FutureCallback<T> = Future<T> Function();
 
@@ -17,7 +19,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   var _redirecting = false;
   var _isLoading = false;
-  late final StreamSubscription<AuthState> _authStateSubscripion;
+  late final StreamSubscription<AuthState> _authStateSubscription;
 
   final _emailController = TextEditingController(text: 'someone@example.com');
   final _passwordController =
@@ -28,7 +30,7 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     super.initState();
 
-    _authStateSubscripion = supabase.auth.onAuthStateChange.listen((event) {
+    _authStateSubscription = supabase.auth.onAuthStateChange.listen((event) {
       if (_redirecting) {
         return;
       }
@@ -42,7 +44,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void dispose() {
-    _authStateSubscripion.cancel();
+    _authStateSubscription.cancel();
     super.dispose();
   }
 
@@ -50,47 +52,50 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Sign in / Sign up Page')),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
-        children: [
-          const Text('Sign in with GitHub'),
-          const SizedBox(
-            height: 18,
-          ),
-          ElevatedButton(
-            onPressed: _isLoading ? null : _signInGitHub,
-            child: Text(_isLoading ? 'Loading' : 'Sign in with GitHub'),
-          ),
-          const SizedBox(
-            height: 18,
-          ),
-          const Divider(),
-          const Text('Email'),
-          TextField(
-            controller: _emailController,
-          ),
-          const SizedBox(
-            height: 18,
-          ),
-          TextField(
-            controller: _passwordController,
-          ),
-          const SizedBox(
-            height: 18,
-          ),
-          TextField(
-            controller: _userNameController,
-          ),
-          ElevatedButton(
-            onPressed: _isLoading ? null : _signInEmail,
-            child: Text(_isLoading ? 'Loading' : 'Sign in Email and Password'),
-          ),
-          const SizedBox(height: 18),
-          ElevatedButton(
-            onPressed: _isLoading ? null : _signUpEmail,
-            child: Text(_isLoading ? 'Loading' : 'Sign up Email and Password'),
-          ),
-        ],
+      body: GestureDetector(
+        onTap: () {
+          FocusManager.instance.primaryFocus?.unfocus();
+        },
+        child: ListView(
+          padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
+          children: [
+            const Text('Sign in with GitHub'),
+            const Gap(8.0),
+            ElevatedButton(
+              onPressed: _isLoading ? null : _signInGitHub,
+              child: Text(_isLoading ? 'Loading' : 'Sign in with GitHub'),
+            ),
+            const Gap(8.0),
+            const Divider(color: Colors.orange, thickness: 3.0),
+            const Text('Sign in with Email / Sign up with Email '),
+            MyTextField(
+              label: 'Email',
+              controller: _emailController,
+            ),
+            const Gap(8.0),
+            MyTextField(
+              label: 'password',
+              controller: _passwordController,
+            ),
+            const Gap(8.0),
+            MyTextField(
+              label: 'user_name',
+              controller: _userNameController,
+            ),
+            const Gap(8.0),
+            ElevatedButton(
+              onPressed: _isLoading ? null : _signInEmail,
+              child:
+                  Text(_isLoading ? 'Loading' : 'Sign in Email and Password'),
+            ),
+            const Gap(8.0),
+            ElevatedButton(
+              onPressed: _isLoading ? null : _signUpEmail,
+              child:
+                  Text(_isLoading ? 'Loading' : 'Sign up Email and Password'),
+            ),
+          ],
+        ),
       ),
     );
   }

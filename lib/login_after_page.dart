@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 
 import 'main.dart';
 
@@ -26,15 +27,13 @@ class _LoginAfterPageState extends State<LoginAfterPage> {
             height: 64,
             width: 64,
             child: avatarUrl != null
-                // ? NetworkImage(avatarUrl)
                 ? Image.network(avatarUrl)
                 : const Icon(Icons.no_photography),
           ),
-          // Text('user.id: ${user.id}'),
           Text('user.name: $userName'),
-          // Text('user.email: ${user.email}'),
-          // Expanded(child: Text('user: ${user}')),
-          const SizedBox(height: 18),
+          const Gap(18),
+          Text('user: $user'),
+          const Gap(18),
           ElevatedButton(onPressed: _signOut, child: const Text('Sign out')),
         ],
       ),
