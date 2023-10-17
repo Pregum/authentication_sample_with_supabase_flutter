@@ -49,11 +49,13 @@ class _LoginAfterPageState extends State<LoginAfterPage> {
     try {
       await supabase.auth.signOut();
     } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Unexcept Error. $error'),
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Unexpected Error. $error'),
+          ),
+        );
+      }
     } finally {
       if (mounted) {
         // setState(() {

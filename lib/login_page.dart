@@ -5,6 +5,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'main.dart';
 
+typedef FutureCallback<T> = Future<T> Function();
+
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -18,7 +20,9 @@ class _LoginPageState extends State<LoginPage> {
   late final StreamSubscription<AuthState> _authStateSubscripion;
 
   final _emailController = TextEditingController(text: 'someone@example.com');
-  final _passwordController = TextEditingController(text: 'rBTWSCWtdgbdaEuhisNF');
+  final _passwordController =
+      TextEditingController(text: 'rBTWSCWtdgbdaEuhisNF');
+  final _userNameController = TextEditingController(text: 'example taro');
 
   @override
   void initState() {
@@ -45,7 +49,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Sign in')),
+      appBar: AppBar(title: const Text('Sign in / Sign up Page')),
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
         children: [
@@ -60,6 +64,8 @@ class _LoginPageState extends State<LoginPage> {
           const SizedBox(
             height: 18,
           ),
+          const Divider(),
+          const Text('Email'),
           TextField(
             controller: _emailController,
           ),
@@ -71,6 +77,9 @@ class _LoginPageState extends State<LoginPage> {
           ),
           const SizedBox(
             height: 18,
+          ),
+          TextField(
+            controller: _userNameController,
           ),
           ElevatedButton(
             onPressed: _isLoading ? null : _signInEmail,
@@ -87,70 +96,51 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _signUpEmail() async {
-    setState(() {
-      _isLoading = true;
-    });
-    try {
+    await _signInFlow(() async {
       final auth = await supabase.auth.signUp(
         email: _emailController.text,
         password: _passwordController.text,
+        data: {'user_name': _userNameController.text},
       );
-      print('auth: $auth');
-    } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Unexcepted Error. $error'),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
-      );
-      print('error: $error');
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
+      debugPrint('auth: $auth');
+    });
   }
 
   Future<void> _signInEmail() async {
-    setState(() {
-      _isLoading = true;
-    });
-    try {
+    await _signInFlow(() async {
       final auth = await supabase.auth.signInWithPassword(
         email: _emailController.text,
         password: _passwordController.text,
       );
-      print('auth: $auth');
-    } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Unexcepted Error. $error'),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
-      );
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
+      debugPrint('auth: $auth');
+    });
   }
 
   Future<void> _signInGitHub() async {
-    try {
-      setState(() {
-        _isLoading = true;
-      });
+    await _signInFlow(() async {
       await supabase.auth.signInWithOAuth(
         Provider.github,
         redirectTo: 'io.supabase.flutterquickstart://login-callback/',
       );
+    });
+  }
+
+  Future<void> _signInFlow(FutureCallback<void> attemptFutureFunc) async {
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+      await attemptFutureFunc();
     } catch (error) {
-      // ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Unexcepted Error. $error'),
-        backgroundColor: Theme.of(context).colorScheme.error,
-      );
-      // );
+      debugPrint('error: $error');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Unexpected Error. $error'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
     } finally {
       setState(() {
         _isLoading = false;
