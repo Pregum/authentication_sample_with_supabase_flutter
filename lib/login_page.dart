@@ -19,12 +19,15 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   var _redirecting = false;
   var _isLoading = false;
+  var _shouldCreateUser = true;
   late final StreamSubscription<AuthState> _authStateSubscription;
 
   final _emailController = TextEditingController(text: 'someone@example.com');
   final _passwordController =
       TextEditingController(text: 'rBTWSCWtdgbdaEuhisNF');
   final _userNameController = TextEditingController(text: 'example taro');
+  final _magicLinkEmailController =
+      TextEditingController(text: 'wizardeveryone@example.com');
 
   @override
   void initState() {
@@ -96,10 +99,43 @@ class _LoginPageState extends State<LoginPage> {
               child:
                   Text(_isLoading ? 'Loading' : 'Sign up Email and Password'),
             ),
+            const Gap(8.0),
+            const Divider(color: Colors.orange, thickness: 3.0),
+            Text('Sign in with magic link',
+                style: Theme.of(context).textTheme.headlineSmall),
+            TextFormField(
+              decoration: const InputDecoration(
+                label: Text('email for magic link'),
+                hintText: 'foobar@example.com',
+              ),
+              controller: _magicLinkEmailController,
+            ),
+            CheckboxListTile.adaptive(
+              title: const Text('shouldCreateUser(default: true)'),
+              value: _shouldCreateUser,
+              onChanged: (value) {
+                if (value != null) {
+                  setState(() => _shouldCreateUser = value);
+                }
+              },
+            ),
+            ElevatedButton(
+              onPressed: _isLoading ? null : _signInMagicLink,
+              child: Text(_isLoading ? 'Loading' : 'Sign in with magic link'),
+            ),
           ],
         ),
       ),
     );
+  }
+
+  Future<void> _signInMagicLink() async {
+    await _signInFlow(() async {
+      await supabase.auth.signInWithOtp(
+        email: _emailController.text,
+        shouldCreateUser: _shouldCreateUser,
+      );
+    });
   }
 
   Future<void> _signUpEmail() async {
