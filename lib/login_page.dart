@@ -34,6 +34,7 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
 
     _authStateSubscription = supabase.auth.onAuthStateChange.listen((event) {
+      debugPrint('event: $event');
       if (_redirecting) {
         return;
       }
@@ -132,8 +133,11 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _signInMagicLink() async {
     await _signInFlow(() async {
       await supabase.auth.signInWithOtp(
-        email: _emailController.text,
+        email: _magicLinkEmailController.text,
         shouldCreateUser: _shouldCreateUser,
+        // 下記URLがsupabase projectのRedirect URLsと一致していないと、リダイレクト後サインインできない(仕様)
+        // ref: https://github.com/supabase/supabase/issues/11995#issuecomment-1647874100
+        emailRedirectTo: 'io.supabase.flutterquickstart://login-callback/',
       );
     });
   }
