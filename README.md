@@ -4,6 +4,24 @@ This repository is a practice repository to try out the features of "Supabase Au
 
 ## How to run
 
+### Setting .env or .env.local
+
+If you use the `--dart-define=ENVIRONMENT=development` option, enter it in the `.env` file.
+ If you do not use the `--dart-define=ENVIRONMENT=development` option, enter it in the `.env.local` file.
+
+The contents of `.env` or `.env.local` are as follows.
+
+```shell
+SUPABASE_URL=http://localhost:54321 # if use cloud service -> https://xxxxxxxxxxxxxxxxxxxx.supabase.co
+SUPABASE_ANONKEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+
+Enter the URL in `SUPABASE_URL` and anonkey in `SUPABASE_ANONKEY`.
+
+See the following page for information on how to search for anonkey and URL strings.
+
+<https://supabase.com/docs/guides/getting-started/tutorials/with-flutter#get-the-api-keys>
+
 ### App
 
 ```shell
@@ -30,7 +48,7 @@ supabase stop
 
 Please see the page below for details.
 
-https://supabase.com/docs/guides/cli/local-development
+<https://supabase.com/docs/guides/cli/local-development>
 
 ## Getting Started
 
