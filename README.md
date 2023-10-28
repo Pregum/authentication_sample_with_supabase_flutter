@@ -1,8 +1,10 @@
 # authentication_sample_with_supabase_flutter
 
-A new Flutter project.
+This repository is a practice repository to try out the features of "Supabase Authentication".
 
-## How to Run
+## How to run
+
+### App
 
 ```shell
 # run with load '.env'
@@ -11,6 +13,24 @@ flutter run --dart-define=ENVIRONMENT=development
 # run with load '.env.local'
 flutter run 
 ```
+
+### Local Supabase server
+
+#### Start
+
+```shell
+supabase start
+```
+
+#### Stop
+
+```shell
+supabase stop
+```
+
+Please see the page below for details.
+
+https://supabase.com/docs/guides/cli/local-development
 
 ## Getting Started
 
