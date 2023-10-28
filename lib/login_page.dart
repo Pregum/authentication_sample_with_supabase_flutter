@@ -34,7 +34,7 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
 
     _authStateSubscription = supabase.auth.onAuthStateChange.listen((event) {
-      debugPrint('event: $event');
+      debugPrint('event: ${ event.event.toString() }');
       if (_redirecting) {
         return;
       }
