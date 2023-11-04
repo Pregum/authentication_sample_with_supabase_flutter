@@ -28,13 +28,15 @@ class _LoginPageState extends State<LoginPage> {
   final _userNameController = TextEditingController(text: 'example taro');
   final _magicLinkEmailController =
       TextEditingController(text: 'wizardeveryone@example.com');
+  final _phoneNumberController = TextEditingController(text: '+81');
+  final _otpController = TextEditingController(text: '');
 
   @override
   void initState() {
     super.initState();
 
     _authStateSubscription = supabase.auth.onAuthStateChange.listen((event) {
-      debugPrint('event: ${ event.event.toString() }');
+      debugPrint('event: ${event.event.toString()}');
       if (_redirecting) {
         return;
       }
@@ -124,10 +126,52 @@ class _LoginPageState extends State<LoginPage> {
               onPressed: _isLoading ? null : _signInMagicLink,
               child: Text(_isLoading ? 'Loading' : 'Sign in with magic link'),
             ),
+            const Gap(8.0),
+            const Divider(color: Colors.orange, thickness: 3.0),
+            Text('Phone Auth with Twilio',
+                style: Theme.of(context).textTheme.headlineSmall),
+            MyTextField(
+              controller: _phoneNumberController,
+              hintText: '+81123456',
+              label: 'Phone Number',
+            ),
+            ElevatedButton(
+              onPressed: _isLoading ? null : _signInSms,
+              child: Text(_isLoading ? 'Loading' : 'Send Phone Number'),
+            ),
+            const Gap(8.0),
+            const Text('OTP Number'),
+            MyTextField(
+              controller: _otpController,
+              hintText: '123456',
+              label: 'One Time Password',
+            ),
+            ElevatedButton(
+              onPressed: _isLoading ? null : _singInVerifyOtp,
+              child: Text(_isLoading ? 'Loading' : 'Verify OTP'),
+            )
           ],
         ),
       ),
     );
+  }
+
+  Future<void> _singInVerifyOtp() async {
+    await _signInFlow(() async {
+      await supabase.auth.verifyOTP(
+        phone: _phoneNumberController.text,
+        token: _otpController.text,
+        type: OtpType.sms,
+      );
+    });
+  }
+
+  Future<void> _signInSms() async {
+    await _signInFlow(() async {
+      await supabase.auth.signInWithOtp(
+        phone: _phoneNumberController.text,
+      );
+    });
   }
 
   Future<void> _signInMagicLink() async {
