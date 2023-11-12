@@ -7,19 +7,20 @@ import './splash_page.dart';
 
 Future<void> main() async {
   const environment = String.fromEnvironment('ENVIRONMENT');
-  await dotenv.load( fileName: environment == 'development' ? '.env' : '.env.local');
-  // await dotenv.load();
+  await dotenv.load(
+      fileName: environment == 'development' ? '.env' : '.env.local');
 
   final supabaseUrl = dotenv.get('SUPABASE_URL', fallback: '');
   final anonKey = dotenv.get('SUPABASE_ANONKEY', fallback: '');
   debugPrint('SUPABASE_URL: $supabaseUrl');
   debugPrint('ANON_KEY: $anonKey');
+  final googleClientId = dotenv.get('GOOGLE_CLIENT_ID', fallback: '');
+  debugPrint('GOOGLE_CLIENT_ID: $googleClientId');
+  final googleWebClientId = dotenv.get('GOOGLE_WEB_CLIENT_ID', fallback: '');
+  debugPrint('GOOGLE_WEB_CLIENT_ID: $googleWebClientId');
 
   await Supabase.initialize(
-    url: supabaseUrl,
-    anonKey: anonKey,
-    authFlowType: AuthFlowType.pkce
-  );
+      url: supabaseUrl, anonKey: anonKey, authFlowType: AuthFlowType.pkce);
   runApp(const MyApp());
 }
 

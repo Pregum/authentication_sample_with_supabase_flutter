@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'main.dart';
 import 'my_text_field.dart';
@@ -30,10 +32,13 @@ class _LoginPageState extends State<LoginPage> {
       TextEditingController(text: 'wizardeveryone@example.com');
   final _phoneNumberController = TextEditingController(text: '+81');
   final _otpController = TextEditingController(text: '');
+  late final String _googleClientId;
 
   @override
   void initState() {
     super.initState();
+
+    _googleClientId = dotenv.get('GOOGLE_CLIENT_ID', fallback: 'unknown...');
 
     _authStateSubscription = supabase.auth.onAuthStateChange.listen((event) {
       debugPrint('event: ${event.event.toString()}');
@@ -149,7 +154,17 @@ class _LoginPageState extends State<LoginPage> {
             ElevatedButton(
               onPressed: _isLoading ? null : _singInVerifyOtp,
               child: Text(_isLoading ? 'Loading' : 'Verify OTP'),
-            )
+            ),
+            const Gap(8.0),
+            const Divider(color: Colors.orange, thickness: 3.0),
+            Text(
+              'Social Login(Google)',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            ElevatedButton(
+              onPressed: _isLoading ? null : _signInWithGoogle,
+              child: const Text('Sign in with Google'),
+            ),
           ],
         ),
       ),
@@ -237,5 +252,37 @@ class _LoginPageState extends State<LoginPage> {
         _isLoading = false;
       });
     }
+  }
+
+  Future<void> _signInWithGoogle() async {
+    await _signInFlow(() async {
+      final webClientId = dotenv.get('GOOGLE_WEB_CLIENT_ID', fallback: '');
+      final googleSignIn = GoogleSignIn(
+          clientId: _googleClientId,
+          serverClientId: webClientId,
+          scopes: [
+            'email',
+            'https://www.googleapis.com/auth/contacts.readonly'
+          ]);
+      final googleUser = await googleSignIn.signIn();
+      final googleAuth = await googleUser!.authentication;
+      final accessToken = googleAuth.accessToken;
+      final idToken = googleAuth.idToken;
+
+      if (accessToken == null) {
+        throw 'No Access Token found.';
+      }
+
+      if (idToken == null) {
+        throw 'No ID Token found.';
+      }
+
+      final result = await supabase.auth.signInWithIdToken(
+        provider: Provider.google,
+        idToken: idToken,
+        accessToken: accessToken,
+      );
+      debugPrint('result: $result ');
+    });
   }
 }
