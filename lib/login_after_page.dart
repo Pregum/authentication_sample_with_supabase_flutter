@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import 'main.dart';
 
@@ -11,6 +12,7 @@ class LoginAfterPage extends StatefulWidget {
 }
 
 class _LoginAfterPageState extends State<LoginAfterPage> {
+  var isCheckedShouldForgetGoogleSignIn = false;
   @override
   Widget build(BuildContext context) {
     final user = supabase.auth.currentSession!.user;
@@ -34,16 +36,43 @@ class _LoginAfterPageState extends State<LoginAfterPage> {
           const Gap(18),
           Text('user: $user'),
           const Gap(18),
-          ElevatedButton(onPressed: _signOut, child: const Text('Sign out')),
+          CheckboxListTile(
+            title: const Text('Google SignIn の再ログイン時、アカウントを選択できるようにする'),
+            value: isCheckedShouldForgetGoogleSignIn,
+            onChanged: (bool? value) {
+              if (value == null) {
+                return;
+              }
+
+              setState(() => isCheckedShouldForgetGoogleSignIn = value);
+            },
+          ),
+          const Gap(18),
+          ElevatedButton(
+              onPressed: () => _signOut(
+                    shouldForgetGoogleSignin: isCheckedShouldForgetGoogleSignIn,
+                  ),
+              child: const Text('Sign out')),
         ],
       ),
     );
   }
 
-  Future<void> _signOut() async {
+  Future<void> _signOut({bool shouldForgetGoogleSignin = false}) async {
     // setState(() {
     //   _loading = true;
     // });
+
+    if (shouldForgetGoogleSignin) {
+      try {
+        // google sign in only.
+        // 再ログイン時、アカウントを選択できるようにする方法
+        final googleSignIn = GoogleSignIn();
+        await googleSignIn.disconnect();
+      } catch (e) {
+        // no op
+      }
+    }
 
     try {
       await supabase.auth.signOut();
