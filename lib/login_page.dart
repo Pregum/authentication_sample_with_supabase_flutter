@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:authentication_sample_with_supabase_flutter/components/google_signin_container.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -8,7 +9,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'main.dart';
-import 'my_text_field.dart';
+import './components/my_text_field.dart';
 
 typedef FutureCallback<T> = Future<T> Function();
 
@@ -36,6 +37,7 @@ class _LoginPageState extends State<LoginPage> {
   late final String _googleClientId;
   late final String _googleWebClientId;
   late final String _googleClientIdIos;
+  final List<String> _selectedScopeUrls = [];
 
   @override
   void initState() {
@@ -167,10 +169,27 @@ class _LoginPageState extends State<LoginPage> {
               'Social Login(Google)',
               style: Theme.of(context).textTheme.headlineSmall,
             ),
-            ElevatedButton(
+            GoogleSigninContainer(
+              onChangedScopeUrl: (nextCheckValue, url) {
+                if (nextCheckValue == true) {
+                  setState(
+                    () {
+                      _selectedScopeUrls.add(url);
+                    },
+                  );
+                } else {
+                  setState(
+                    () {
+                      _selectedScopeUrls.remove(url);
+                    },
+                  );
+                }
+              },
+              selectedScopes: _selectedScopeUrls,
+              isLoading: _isLoading,
               onPressed: _isLoading ? null : _signInWithGoogle,
-              child: const Text('Sign in with Google'),
             ),
+            const Gap(64)
           ],
         ),
       ),
@@ -262,10 +281,12 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _signInWithGoogle() async {
     await _signInFlow(() async {
+      final scopes = ['email', ..._selectedScopeUrls];
+      debugPrint('scopes: $scopes');
       final googleSignIn = GoogleSignIn(
         clientId: Platform.isAndroid ? _googleClientId : _googleClientIdIos,
         serverClientId: _googleWebClientId,
-        scopes: ['email', 'https://www.googleapis.com/auth/contacts.readonly'],
+        scopes: scopes,
       );
       final googleUser = await googleSignIn.signIn();
       final googleAuth = await googleUser!.authentication;

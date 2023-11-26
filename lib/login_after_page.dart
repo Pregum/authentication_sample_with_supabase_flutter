@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -16,7 +18,10 @@ class _LoginAfterPageState extends State<LoginAfterPage> {
   @override
   Widget build(BuildContext context) {
     final user = supabase.auth.currentSession!.user;
+    const encoder = JsonEncoder.withIndent('  ');
+    final prettyUserJson = encoder.convert(user);
     final userMetadata = user.userMetadata;
+    final appMetaData = encoder.convert(user.appMetadata);
     final avatarUrl = userMetadata?['avatar_url'] as String?;
     final userName = userMetadata?['user_name'] as String? ?? 'unknown name';
     // final userMetadataKeys =['email', 'email_verified', 'iss', 'full_name', 'provider_id', 'sub' , 'user_name'];
@@ -24,6 +29,7 @@ class _LoginAfterPageState extends State<LoginAfterPage> {
     return Scaffold(
       appBar: AppBar(title: const Text('Login After')),
       body: ListView(
+      padding: const EdgeInsets.all(8.0),
         children: [
           SizedBox(
             height: 64,
@@ -34,7 +40,7 @@ class _LoginAfterPageState extends State<LoginAfterPage> {
           ),
           Text('user.name: $userName'),
           const Gap(18),
-          Text('user: $user'),
+          Text('user: $prettyUserJson'),
           const Gap(18),
           CheckboxListTile(
             title: const Text('Google SignIn の再ログイン時、アカウントを選択できるようにする'),
