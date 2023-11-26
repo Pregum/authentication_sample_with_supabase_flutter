@@ -54,6 +54,7 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>io.supabase.flutterquickstart</string>
+				<string>com.googleusercontent.apps.517804817733-t0m6s92j9f2uruatf3j8qpcmta4tbeki</string>
 			</array>
 		</dict>
 	</array>

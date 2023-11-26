@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
@@ -33,12 +34,17 @@ class _LoginPageState extends State<LoginPage> {
   final _phoneNumberController = TextEditingController(text: '+81');
   final _otpController = TextEditingController(text: '');
   late final String _googleClientId;
+  late final String _googleWebClientId;
+  late final String _googleClientIdIos;
 
   @override
   void initState() {
     super.initState();
 
     _googleClientId = dotenv.get('GOOGLE_CLIENT_ID', fallback: 'unknown...');
+    _googleWebClientId = dotenv.get('GOOGLE_WEB_CLIENT_ID', fallback: '');
+    _googleClientIdIos =
+        dotenv.get('GOOGLE_CLIENT_ID_IOS', fallback: 'unknown...');
 
     _authStateSubscription = supabase.auth.onAuthStateChange.listen((event) {
       debugPrint('event: ${event.event.toString()}');
@@ -256,14 +262,11 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _signInWithGoogle() async {
     await _signInFlow(() async {
-      final webClientId = dotenv.get('GOOGLE_WEB_CLIENT_ID', fallback: '');
       final googleSignIn = GoogleSignIn(
-          clientId: _googleClientId,
-          serverClientId: webClientId,
-          scopes: [
-            'email',
-            'https://www.googleapis.com/auth/contacts.readonly'
-          ]);
+        clientId: Platform.isAndroid ? _googleClientId : _googleClientIdIos,
+        serverClientId: _googleWebClientId,
+        scopes: ['email', 'https://www.googleapis.com/auth/contacts.readonly'],
+      );
       final googleUser = await googleSignIn.signIn();
       final googleAuth = await googleUser!.authentication;
       final accessToken = googleAuth.accessToken;
