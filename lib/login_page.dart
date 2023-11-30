@@ -189,6 +189,16 @@ class _LoginPageState extends State<LoginPage> {
               isLoading: _isLoading,
               onPressed: _isLoading ? null : _signInWithGoogle,
             ),
+            const Gap(8.0),
+            const Divider(color: Colors.orange, thickness: 3.0),
+            Text(
+              'Social Login(Facebook)',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            ElevatedButton(
+              onPressed: _isLoading ? null : _signInWithFacebook,
+              child: Text(_isLoading ? 'Loading' : 'Sign in with Facebook'),
+            ),
             const Gap(64)
           ],
         ),
@@ -307,6 +317,15 @@ class _LoginPageState extends State<LoginPage> {
         accessToken: accessToken,
       );
       debugPrint('result: $result ');
+    });
+  }
+
+  Future<void> _signInWithFacebook() async {
+    await _signInFlow(() async {
+      await supabase.auth.signInWithOAuth(
+        Provider.facebook,
+        redirectTo: 'io.supabase.flutterquickstart://login-callback/',
+      );
     });
   }
 }
