@@ -260,7 +260,7 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _signInGitHub() async {
     await _signInFlow(() async {
       await supabase.auth.signInWithOAuth(
-        Provider.github,
+        OAuthProvider.github,
         redirectTo: 'io.supabase.flutterquickstart://login-callback/',
       );
     });
@@ -312,7 +312,7 @@ class _LoginPageState extends State<LoginPage> {
       }
 
       final result = await supabase.auth.signInWithIdToken(
-        provider: Provider.google,
+        provider: OAuthProvider.google,
         idToken: idToken,
         accessToken: accessToken,
       );
@@ -323,7 +323,7 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _signInWithFacebook() async {
     await _signInFlow(() async {
       await supabase.auth.signInWithOAuth(
-        Provider.facebook,
+        OAuthProvider.facebook,
         redirectTo: 'io.supabase.flutterquickstart://login-callback/',
       );
     });

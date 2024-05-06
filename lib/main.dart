@@ -20,7 +20,11 @@ Future<void> main() async {
   debugPrint('GOOGLE_WEB_CLIENT_ID: $googleWebClientId');
 
   await Supabase.initialize(
-      url: supabaseUrl, anonKey: anonKey, authFlowType: AuthFlowType.pkce);
+    url: supabaseUrl,
+    anonKey: anonKey,
+    authOptions:
+        const FlutterAuthClientOptions(authFlowType: AuthFlowType.pkce),
+  );
   runApp(const MyApp());
 }
 
