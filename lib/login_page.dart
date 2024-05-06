@@ -38,6 +38,7 @@ class _LoginPageState extends State<LoginPage> {
   late final String _googleWebClientId;
   late final String _googleClientIdIos;
   final List<String> _selectedScopeUrls = [];
+  final _anonymousUserName = TextEditingController(text: 'no name avatar');
 
   @override
   void initState() {
@@ -199,7 +200,21 @@ class _LoginPageState extends State<LoginPage> {
               onPressed: _isLoading ? null : _signInWithFacebook,
               child: Text(_isLoading ? 'Loading' : 'Sign in with Facebook'),
             ),
-            const Gap(64)
+            const Gap(16),
+            const Divider(color: Colors.orange, thickness: 3.0),
+            Text(
+              'Anonymous Sign in',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            MyTextField(
+              label: 'user_name',
+              controller: _anonymousUserName,
+            ),
+            ElevatedButton(
+              onPressed: _isLoading ? null : _signInWithAnonymous,
+              child: Text(_isLoading ? 'Loading' : 'Sign in with Anonymous'),
+            ),
+            const Gap(64),
           ],
         ),
       ),
@@ -260,7 +275,7 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _signInGitHub() async {
     await _signInFlow(() async {
       await supabase.auth.signInWithOAuth(
-        Provider.github,
+        OAuthProvider.github,
         redirectTo: 'io.supabase.flutterquickstart://login-callback/',
       );
     });
@@ -312,7 +327,7 @@ class _LoginPageState extends State<LoginPage> {
       }
 
       final result = await supabase.auth.signInWithIdToken(
-        provider: Provider.google,
+        provider: OAuthProvider.google,
         idToken: idToken,
         accessToken: accessToken,
       );
@@ -323,8 +338,16 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _signInWithFacebook() async {
     await _signInFlow(() async {
       await supabase.auth.signInWithOAuth(
-        Provider.facebook,
+        OAuthProvider.facebook,
         redirectTo: 'io.supabase.flutterquickstart://login-callback/',
+      );
+    });
+  }
+  
+  Future<void> _signInWithAnonymous() async {
+    await _signInFlow(() async {
+      await supabase.auth.signInAnonymously(
+        data: {'user_name': _anonymousUserName.text },
       );
     });
   }
