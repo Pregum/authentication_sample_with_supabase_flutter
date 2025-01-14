@@ -50,3 +50,6 @@ app.*.map.json
 
 **/.env
 **/.env.local
+
+# FVM Version Cache
+.fvm/
